@@ -1,0 +1,297 @@
+---
+title: "Thesis"
+author: "James Malloy"
+format: html
+editor: visual
+execute: 
+  warning: false
+editor_options: 
+  chunk_output_type: console
+---
+
+# Thesis topic
+
+College grades/Grade inflation/Covid-19 Pandemic
+
+# Background to the problem
+
+Background: Grade inflation is a topic of interest and concern for college students, professors, and university administrators. The Covid-19 pandemic brought this issue yet again to the forefront when all stakeholders were tasked with challenge and teaching and learning during this difficult time. Professors
+
+# Research question
+
+What are the variables that explain this jump?
+
+* undergrad vs grad?
+* College type (e.g. CEHD, College of Arts and Sciences, Robinson College of Business, etc. )
+
+```{r message=FALSE, warning=FALSE}
+library (tidyverse)
+library(janitor)
+theme_set(theme_light())
+
+create_cols <-  function(df){
+  df %>% 
+    mutate(
+      crn = CRN,
+      year = year,
+      term = term,
+      professor = Professor,
+      course = Course,
+      As = `A  (90-100)`,
+      Bs = `B  (80-89)`,
+      Cs = `C  (70-79)`,
+      Ds = `D  (60-69)`,
+      total_Fs = `F <60`,
+      withdraw_fail = WF.x,
+      As_through_WFs = `A- WF`, # N grades given?
+      dwf = DWF.x, # N drops, withdrawls, and fails
+      avg_gpa = `CRS AVG`,
+      other = Other.x,
+      n_grades_given = Total.x,
+      instruction_method_raw = `Instruction Method.x`,
+      A_plus = `A+`,
+      A_regular = A,
+      A_minus = `A-`,
+      B_plus = `B+`,
+      B_regular = B,
+      B_minus = `B-`,
+      C_plus = `C+`,
+      C_regular = C,
+      C_minus = `C-`,
+      D_regular = D,
+      F_regular = `F`
+      ) %>% 
+    select(35:62)
+} 
+
+fall_2016_raw <- read_csv("2016-fall-grades.csv")
+fall_2016_detail <- read_csv("2016-fall-grades-detail.csv")
+fall_2016 <- 
+  fall_2016_raw %>% 
+  left_join(fall_2016_detail, "CRN") %>% 
+  mutate(year = 2016, term = "Fall") %>% 
+  create_cols()
+fall_2016_detail %>% count(`Instruction Method`)
+fall_2016_raw %>% count(`Instruction Method`)
+fall_2016 %>% count(instruction_method_raw)
+
+spring_2016_raw <- read_csv("2016-spring-grades.csv")
+spring_2016_detail <- read_csv("2016-spring-grades-detail.csv")
+spring_2016 <- 
+  spring_2016_raw %>% 
+  left_join(spring_2016_detail, "CRN") %>% 
+  mutate(year = 2016, term = "Spring") %>% 
+  create_cols()
+
+fall_2017_raw <- read_csv("2017-fall-grades.csv")
+fall_2017_detail <- read_csv("2017-fall-grades-detail.csv")
+fall_2017 <- 
+  fall_2017_raw %>% 
+  left_join(fall_2017_detail, "CRN") %>% 
+  mutate(year = 2017, term = "Fall") %>% 
+  create_cols()
+
+spring_2018_raw <- read_csv("2018-spring-grades.csv")
+spring_2018_detail <- read_csv("2018-spring-grades-detail.csv")
+spring_2018 <- 
+  spring_2018_raw %>% 
+  left_join(spring_2018_detail, "CRN") %>% 
+  mutate(year = 2018, term = "Spring") %>% 
+  create_cols()
+
+fall_2018_raw <- read_csv("2018-fall-grades.csv")
+fall_2018_detail <- read_csv("2018-fall-grades-detail.csv")
+fall_2018 <- 
+  fall_2018_raw %>% 
+  left_join(fall_2018_detail, "CRN") %>% 
+  mutate(year = 2018, term = "Fall") %>% 
+  create_cols()
+
+spring_2019_raw <- read_csv("2019-spring_grades.csv")
+spring_2019_detail <- read_csv("2019-spring-grades-detail.csv")
+spring_2019 <- 
+  spring_2019_raw %>% 
+  left_join(spring_2019_detail, "CRN") %>% 
+  mutate(year = 2019, term = "Spring") %>% 
+  create_cols()
+
+fall_2019_raw <- read_csv("2019-fall-grades.csv")
+fall_2019_detail <- read_csv("2019-fall-grades-detail.csv")
+fall_2019 <- 
+  fall_2019_raw %>% 
+  left_join(fall_2019_detail, "CRN") %>% 
+  mutate(year = 2019, term = "Fall") %>% 
+  create_cols()
+
+spring_2020_raw <- read_csv("2020-spring-grades.csv")
+spring_2020_detail <- read_csv("2020-spring-grades-detail.csv")
+spring_2020 <- 
+  spring_2020_raw %>% 
+  left_join(spring_2020_detail, "CRN") %>% 
+  mutate(year = 2020, term ="Spring") %>% 
+  create_cols()
+
+fall_2020_raw <- read_csv("2020-fall-grades.csv")
+fall_2020_detail <- read_csv("2020-fall-grades-detail.csv")
+fall_2020 <- 
+  fall_2020_raw %>% 
+  left_join(fall_2019_detail, "CRN") %>% 
+  mutate(year = 2020, term = "Fall") %>% 
+  create_cols()
+
+spring_2021_raw <- read_csv("2021-spring-grades.csv")
+spring_2021_detail <- read_csv("2021-spring-grades-detail.csv")
+spring_2021 <- 
+  spring_2021_raw %>% 
+  left_join(spring_2020_detail, "CRN") %>% 
+  mutate(year = 2021, term = "Spring") %>% 
+  create_cols()
+
+
+fall_2021_raw <- read_csv("2021-fall-grades.csv")
+fall_2021_detail <- read_csv("2021-fall-grades-detail.csv")
+fall_2021 <- 
+  fall_2021_raw %>% 
+  left_join(fall_2021_detail, "CRN") %>% 
+  mutate(year = 2021, term = "Fall") %>% 
+  create_cols()
+
+spring_2022_raw <- read_csv("2022-spring-grades.csv")
+spring_2022_detail <- read_csv("2022-spring-grades-detail.csv")
+spring_2022 <- 
+  spring_2022_raw %>% 
+  left_join(spring_2022_detail, "CRN") %>% 
+  mutate(year = 2022, term = "Spring") %>% 
+  create_cols()
+
+df <-
+  bind_rows(
+    fall_2016,
+    spring_2016,
+    fall_2017,
+    spring_2018,
+    fall_2018,
+    spring_2019,
+    fall_2019,
+    spring_2020,
+    fall_2020,
+    spring_2021,
+    fall_2021,
+    spring_2022
+  ) %>%
+  filter(crn != "Report Total:") %>% 
+  mutate(
+    term_year = paste(term, year)) %>% 
+  mutate(
+    term_year_ordered = case_when(
+      term_year == "Fall 2017" ~ 1,
+      term_year == "Spring 2018" ~ 2,
+      term_year == "Fall 2018" ~ 3,
+      term_year == "Spring 2019" ~ 4,
+      term_year == "Fall 2019" ~ 5,
+      term_year == "Spring 2020" ~ 6,
+      term_year == "Fall 2020" ~ 7,
+      term_year == "Spring 2021" ~ 8,
+      term_year == "Fall 2021" ~ 9,
+      term_year == "Spring 2022" ~ 10
+    )) %>% 
+  mutate(
+    instruction_method_recode = case_when(
+      instruction_method_raw == "T" ~ "Face-to-Face",
+      instruction_method_raw == "E" ~ "Online",
+      instruction_method_raw == "H" ~ "Hybrid",
+      instruction_method_raw == "P" ~ "Partially Distance + 50% Tech",
+      instruction_method_raw == "F" ~ "Fully Distance 95% Tech",
+      TRUE ~ as.character("?")),
+    .after = instruction_method_raw) %>% 
+  mutate(
+    course_prefix = str_replace_all(course, "[:digit:]", ""),
+    course_pnbr = (str_remove_all(course, "\\D+")),
+    undergrad_or_grad = case_when(as.numeric(course_pnbr) >= 7000 ~ "Graduate",
+                                  as.numeric(course_pnbr) < 7000 ~ "Undergraduate")
+  ) %>% 
+  mutate(
+    online_or_f2f = case_when(instruction_method_recode == "Face-to-Face" ~ "Face-to-Face",
+                               instruction_method_recode == "Online" ~ "Online")
+  )
+
+labels <- c("Fall 2017", "Spring 2018", "Fall 2018", "Spring 2019", "Fall 2019", 
+            "Spring 2020", "Fall 2020", "Spring 2021", "Fall 2021", "Spring 2022")
+
+df %>% 
+  filter(term_year_ordered > 2,
+         term != "Summer") %>% 
+  ggplot(aes(x = term_year_ordered, avg_gpa, 
+                  color = term_year)) + 
+  geom_vline(xintercept = 5.75, size = 2, color = "red") +
+  geom_jitter(width = .1) +
+  stat_summary(fun = mean, geom = "crossbar") +
+  scale_x_continuous(name = "Term",
+                     breaks = 1:10,
+                     labels = labels) +
+  #theme(legend.position = "none") +
+  labs(y = "Average GPA",
+       title  = "Was there a change in average GPA after the pandemic?",
+       caption = "Red line indicates Pandemic")
+
+# df %>% 
+#   ggplot(aes(fall_2019, spring_2020)) + 
+#   geom_point() +
+#   #theme(legend.position = "none") +
+#   labs(y = "Average GPA",
+#        title  = "Was there a change in average GPA after the pandemic?",
+#        caption = "Red line indicates Pandemic")
+#   
+summary_by_term <- 
+  df %>% 
+  group_by(term_year_ordered, term_year) %>% 
+  summarize(n_professors = n_distinct(professor),
+            n_courses = n(),
+            n_f2f_courses = sum(instruction_method_recode == "Face-to-Face", na.rm = T),
+            n_online_courses = sum(instruction_method_recode == "Online", na.rm = T),
+            avg_gpa = mean(avg_gpa, na.rm = T))
+
+summary_by_term 
+
+ggplot(summary_by_term, aes(term_year, avg_gpa)) + 
+  geom_point() + 
+  geom_line()
+
+
+df %>% 
+  ggplot(aes(term_year,course_avg)) + 
+  geom_point() +
+  stat_summary(geom = "crossbar") +
+  coord_flip()
+
+# df_pandemic <-
+#   df %>%
+#   filter(term_year_ordered == 5 |
+#            term_year_ordered == 6) %>%
+#   group_by(n_classes_taught, term_year) %>%
+#   summarize(n_classes_taught = n(),
+#             avg_gpa = mean(avg_gpa, na.rm = T)) %>%
+#   pivot_wider(names_from = term_year,
+#               values_from = avg_gpa) %>%
+#   mutate(diff = `Spring 2020` - `Fall 2019`)
+# 
+fortner <- df %>% filter(professor == "Fortner, Charles")
+pigott <-
+  df %>%
+  filter(str_detect(professor, "Pigott")) %>%
+  arrange(term_year_ordered) %>%
+  select(term_year, professor, course, crn, instruction_method_raw,  instruction_method_recode)
+# 
+# eprs <- 
+#   df %>% 
+#   filter(str_detect(course, "EPRS") | str_detect(professor, "Pigott")) %>% 
+#   arrange(term_year_ordered) %>% 
+#   group_by(instruction_method_recode) %>% 
+#   slice_head(n = 12) %>% 
+#   select(term_year, professor, course, crn, instruction_method_raw, instruction_method_recode)
+# 
+# df_NULL <- df %>% filter(instruction_method_raw == "NULL")
+# collapse in stata
+# weight this by # of students in the class
+```
+
