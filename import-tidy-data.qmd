@@ -21,8 +21,8 @@ Background: Grade inflation is a topic of interest and concern for college stude
 
 What are the variables that explain this jump?
 
-* undergrad vs grad?
-* College type (e.g. CEHD, College of Arts and Sciences, Robinson College of Business, etc. )
+-   undergrad vs grad?
+-   College type (e.g. CEHD, College of Arts and Sciences, Robinson College of Business, etc. )
 
 ```{r message=FALSE, warning=FALSE}
 library (tidyverse)
@@ -264,16 +264,16 @@ df %>%
   stat_summary(geom = "crossbar") +
   coord_flip()
 
-# df_pandemic <-
-#   df %>%
-#   filter(term_year_ordered == 5 |
-#            term_year_ordered == 6) %>%
-#   group_by(n_classes_taught, term_year) %>%
-#   summarize(n_classes_taught = n(),
-#             avg_gpa = mean(avg_gpa, na.rm = T)) %>%
-#   pivot_wider(names_from = term_year,
-#               values_from = avg_gpa) %>%
-#   mutate(diff = `Spring 2020` - `Fall 2019`)
+df_pandemic <-
+  df %>%
+  filter(term_year_ordered == 5 |
+           term_year_ordered == 6) %>%
+  group_by(n_classes_taught, term_year) %>%
+  summarize(n_classes_taught = n(),
+            avg_gpa = mean(avg_gpa, na.rm = T)) %>%
+  pivot_wider(names_from = term_year,
+              values_from = avg_gpa) %>%
+  mutate(diff = `Spring 2020` - `Fall 2019`)
 # 
 fortner <- df %>% filter(professor == "Fortner, Charles")
 pigott <-
@@ -294,4 +294,3 @@ pigott <-
 # collapse in stata
 # weight this by # of students in the class
 ```
-

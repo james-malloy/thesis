@@ -20,7 +20,7 @@ create_cols <-  function(df){
       dwf = DWF.x, # N drops, withdrawls, and fails
       avg_gpa = `CRS AVG`,
       other = Other.x,
-      n_students_enrolled = Total.x,
+      n_grades_given = Total.x,
       instruction_method_raw = `Instruction Method.x`,
       A_plus = `A+`,
       A_regular = A,
@@ -139,6 +139,8 @@ spring_2022 <-
 
 df <-
   bind_rows(
+    fall_2016,
+    spring_2016,
     fall_2017,
     spring_2018,
     fall_2018,
@@ -184,52 +186,36 @@ df <-
   mutate(
     online_or_f2f = case_when(instruction_method_recode == "Face-to-Face" ~ "Face-to-Face",
                               instruction_method_recode == "Online" ~ "Online")
-  ) %>% 
-  mutate(term_year = ordered(term_year_ordered, levels = 1:10, labels = labels))
-
+  )
 
 labels <- c("Fall 2017", "Spring 2018", "Fall 2018", "Spring 2019", "Fall 2019", 
             "Spring 2020", "Fall 2020", "Spring 2021", "Fall 2021", "Spring 2022")
 
 df %>% 
-  ggplot(aes(term_year, avg_gpa, 
-             color = as.character(term_year))) + 
+  filter(term_year_ordered > 2,
+         term != "Summer") %>% 
+  ggplot(aes(x = term_year_ordered, avg_gpa, 
+             color = term_year)) + 
   geom_vline(xintercept = 5.75, size = 2, color = "red") +
   geom_jitter(width = .1) +
   stat_summary(fun = mean, geom = "crossbar") +
-  scale_x_discrete(labels = label_wrap(9)) +
+  scale_x_continuous(name = "Term",
+                     breaks = 1:10,
+                     labels = labels) +
   theme(legend.position = "none") +
-  labs(x = "Term",
-       y = "Average GPA",
+  labs(y = "Average GPA",
        title  = "Was there a change in average GPA after the pandemic?",
        caption = "Red line indicates Pandemic")
 
 df_pandemic <-
   df %>%
-  select(1:5,14:18,30:35) %>% 
   filter(term_year_ordered == 5 |
            term_year_ordered == 6) %>%
+  group_by(term_year, professor, course, crn) %>% 
+  summarize(n_classes_taught = n(),
+            avg_gpa = mean(avg_gpa, na.rm = T))# %>%
   pivot_wider(names_from = term_year,
-              values_from = c(course, term_year, avg_gpa),
-              names_glue = "{term_year}_{.value}") %>% 
-  clean_names()
-  group_by(professor, term_year)
-  summarize(
-    n = n()
-  )
+              values_from = avg_gpa) #%>%
+  mutate(diff = `Spring 2020` - `Fall 2019`)
   
-df_temp <- 
-  df %>% 
-  select(term_year, professor, crn, course, n_students_enrolled, 
-         avg_gpa, undergrad_or_grad, online_or_f2f) %>% 
-  filter(str_detect(course, c("EPRS"))) %>%
-  group_by(professor) %>% 
-  mutate(professor_alias = randomNames(), .after = professor) %>% 
-  ungroup %>% 
-  mutate(course_number_alias = runif(n = 202, min = 10000, max = 99999) %>% round(0),
-         .after = crn) %>% 
-  arrange(professor, term_year) %>% 
-  select(-professor, -crn) %>% 
-  slice_sample(n = 100)
-
-
+fortner <- df %>% filter(professor == "Fortner, Charles")
