@@ -209,6 +209,7 @@ df_pandemic <-
   select(1:5,14:18,30:35) %>% 
   filter(term_year_ordered == 5 |
            term_year_ordered == 6) %>%
+  mutate(professor_2 = professor) %>% 
   pivot_wider(names_from = term_year,
               values_from = c(course, term_year, avg_gpa),
               names_glue = "{term_year}_{.value}") %>% 
@@ -232,4 +233,59 @@ df_temp <-
   select(-professor, -crn) %>% 
   slice_sample(n = 100)
 
+df_temp <- 
+  df %>%
+  select(1:5,14:18,30:35) %>% 
+  filter(term_year_ordered == 5 |
+           term_year_ordered == 6) %>%
+  mutate(professor_2 = professor) %>%
+  group_by(professor) %>% 
+  pivot_wider(
+    names_from = term_year,
+    values_from = c(course, avg_gpa, professor_2),
+    names_glue = "{term_year}_{.value}"
+  ) %>%
+  clean_names()
 
+fall <- 
+  df %>% 
+  group_by(professor) %>% 
+  filter(term == "Fall",
+         year == 2019)
+
+spring <- 
+  df %>% 
+  group_by(professor) %>% 
+  filter(term == "Spring",
+         year == 2020) %>% 
+  select(professor, course, avg_gpa, online_or_f2f)
+
+df_fall_spring <- 
+  fall %>% 
+  full_join(spring, by = c("professor", "course")) %>% 
+  mutate(diff = avg_gpa.y - avg_gpa.x) %>% 
+  filter(!is.na(diff))
+
+df_summary <- 
+  df_fall_spring %>% 
+  group_by(professor) %>% 
+  summarize(
+    n = n()
+  )
+
+ggplot(df_fall_spring, aes(diff)) + 
+  geom_histogram(color = "white",
+                 binwidth = .1)
+
+df_fall_spring %>% group_by(undergrad_or_grad) %>% summarize(n = n())
+df_fall_spring %>% group_by(online_or_f2f.x) %>% summarize(n = n())
+df_fall_spring %>% group_by(online_or_f2f.y) %>% summarize(n = n())
+
+ggplot(df_fall_spring, aes(instruction_method_recode, diff,
+               color = instruction_method_recode)) + 
+  geom_jitter(width = .1)
+
+ggplot(df_fall_spring, aes(undergrad_or_grad, diff,
+                           color = undergrad_or_grad)) + 
+  geom_jitter(width =.2) +
+  theme(legend.position = "none")
