@@ -1,0 +1,46 @@
+---
+title: "One page description"
+author: "James Malloy"
+format: docx
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r message=FALSE, warning=FALSE, echo= FALSE}
+library(tidyverse)
+library(knitr)
+fall_vs_spring <- read_csv("fall_vs_spring.csv")
+```
+
+# Topic
+
+# Background
+
+# Research Question
+
+What characteristics explain the differences in GPA pre- and post-Pandemic?
+
+-   Professor characteristics (Sex/Gender, Age, Tenure, etc.)
+
+-   Course level (Graduate vs Undergraduate)
+
+-   College (e.g. CEHD vs PMAP vs Robinson Business School, etc.)
+
+-   Department (EPRS vs EPSF vs EPY etc.)
+
+```{r message=FALSE, warning=FALSE}
+read_csv("fall_vs_spring.csv") %>% 
+  select(professor, course, crn_fall, crn_spring, n_students_fall, n_students_spring,
+         gpa_fall, gpa_spring, diff) %>% 
+  head(10) %>% 
+  kable(caption = "Academic Year 2019-2020")
+```
+
+```{r}
+fall_vs_spring %>% ggplot(aes(diff)) + 
+  geom_histogram(color = "white", binwidth = .1) +
+  labs(x = "Difference in GPA",
+       title = "What is the distribution of the DV, difference?",
+       subtitle = "Fall 2019 vs Spring 2020")
+```
